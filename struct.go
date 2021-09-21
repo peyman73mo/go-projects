@@ -16,17 +16,20 @@ func main() {
 		id:   1,
 	}
 	var a2 = t1{
-		"peyman",
-		1,
+		"jack",
+		2,
 	}
 
-	f1(&a1)
-	f1(&a2)
+	f2(&a1)
+	f1(a2)
 	a2.id++
 	fmt.Println(a1)
 	fmt.Println(a2)
 }
 
-func f1(u *t1) {
+func f1(u t1) {
+	u.id = 0
+}
+func f2(u *t1) {
 	u.id = 0
 }
