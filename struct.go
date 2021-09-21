@@ -15,6 +15,13 @@ func (t1 T1) show() {
 	fmt.Println("name :", t1.name)
 	fmt.Println("id :", t1.id)
 }
+func show() {
+	fmt.Println("this is just a function")
+}
+func (t1 *T1) changer() {
+	t1.name = "blank"
+	t1.id = -1
+}
 
 func main() {
 
@@ -31,8 +38,12 @@ func main() {
 	fmt.Println(a1)
 
 	f1(a2)
-	a2.id++
+	// a2.id++
+	a2.changer()
 	a2.show()
+
+	// show()
+
 }
 
 func f1(u T1) {
