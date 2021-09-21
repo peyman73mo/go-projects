@@ -19,4 +19,9 @@ func main() {
 		fmt.Println("no")
 	}
 
+	var chr3 = []byte("something")
+	for _, i := range chr3 {
+		fmt.Println(string(i))
+	}
+
 }
