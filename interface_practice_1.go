@@ -36,7 +36,7 @@ func main() {
 	// var a F = S{"this is S type struct"}
 	// fmt.Printf("type : %T\n", a)
 	// ----------------------------------------------------------------
-	// // *** this is a error  ***
+	// // *** this is an error  ***
 	// // fmt.Println(a.info)
 
 	// a.F1()
