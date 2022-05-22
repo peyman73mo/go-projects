@@ -1,4 +1,4 @@
-module github.com/peyman73mo/go-practice
+module github.com/peyman73mo/go-practice/network-cli-test
 
 go 1.17
 
