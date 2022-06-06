@@ -5,9 +5,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
+	"syscall"
 
 	"github.com/docker/docker/pkg/reexec"
 )
@@ -62,28 +62,28 @@ func main() {
 	*/
 	// syscall.SysProcAttr allows us to set attributes on *exec.Cmd
 	// each CLONE_NEW* adds new namespace to the process (UTS, PID, NS, USER, NET, IPC)
-	// cmd.SysProcAttr = &syscall.SysProcAttr{
-	// 	Cloneflags: syscall.CLONE_NEWUTS |
-	// 		syscall.CLONE_NEWUSER |
-	// 		syscall.CLONE_NEWPID |
-	// 		syscall.CLONE_NEWNS |
-	// 		syscall.CLONE_NEWNET |
-	// 		syscall.CLONE_NEWIPC,
-	// 	UidMappings: []syscall.SysProcIDMap{ // map the child process's UID to the parent process's UID
-	// 		{
-	// 			ContainerID: 0,
-	// 			HostID:      os.Getuid(),
-	// 			Size:        1,
-	// 		},
-	// 	},
-	// 	GidMappings: []syscall.SysProcIDMap{ // map the child process's GID to the parent process's GID in new user namespace
-	// 		{
-	// 			ContainerID: 0,
-	// 			HostID:      os.Getgid(),
-	// 			Size:        1,
-	// 		},
-	// 	},
-	// }
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Cloneflags: syscall.CLONE_NEWUTS |
+			syscall.CLONE_NEWUSER |
+			syscall.CLONE_NEWPID |
+			syscall.CLONE_NEWNS |
+			syscall.CLONE_NEWNET |
+			syscall.CLONE_NEWIPC,
+		UidMappings: []syscall.SysProcIDMap{ // map the child process's UID to the parent process's UID
+			{
+				ContainerID: 0,
+				HostID:      os.Getuid(),
+				Size:        1,
+			},
+		},
+		GidMappings: []syscall.SysProcIDMap{ // map the child process's GID to the parent process's GID in new user namespace
+			{
+				ContainerID: 0,
+				HostID:      os.Getgid(),
+				Size:        1,
+			},
+		},
+	}
 
 	must(cmd.Run())
 
@@ -91,6 +91,6 @@ func main() {
 
 func must(err error) {
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
