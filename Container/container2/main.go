@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	switch os.Args[0] {
+	switch os.Args[1] {
 	case "Run":
 		Run()
 	case "Child":
@@ -21,7 +21,7 @@ func main() {
 func Run() {
 	fmt.Printf("[New-Container]\n")
 	fmt.Printf("[Running %v]\n", os.Args[1])
-
+	// run itself : /proc/self/exe child /bin/bash
 	cmd := exec.Command("/proc/self/exe", append([]string{"Child"}, os.Args[1:]...)...)
 
 	// map the child process's stdin/stdout/stderr to os.Stdin/os.Stdout/os.Stderr
@@ -47,6 +47,7 @@ func Run() {
 			syscall.CLONE_NEWUSER |
 			syscall.CLONE_NEWNET |
 			syscall.CLONE_NEWIPC,
+		Unshareflags: syscall.CLONE_NEWNS, // unshare the mount namespace from the host
 	}
 
 	err := cmd.Run()
@@ -65,17 +66,27 @@ func Child() {
 	cmd.Stderr = os.Stderr
 
 	// https://man7.org/linux/man-pages/man2/gethostname.2.html
-	check(syscall.Sethostname([]byte("[new-container]$")))
+	check(syscall.Sethostname([]byte("[new-container]$")), "syscall.sethostname")
 
 	// https://man7.org/linux/man-pages/man2/chroot.2.html
-	check(syscall.Chroot("ubuntu-fs/")) // mkdir /tmp/ubuntu-fs;mv ubuntu-fs /tmp/ubuntu-fs
+	// changes the root directory of the calling process to /tmp/ubuntu-fs
+	check(syscall.Chroot("/tmp/ubuntu-fs/"), "syscall.chroot") // mkdir /tmp/ubuntu-fs;mv ubuntu-fs /tmp/ubuntu-fs
 
 	// https://man7.org/linux/man-pages/man2/chdir.2.html
-	check(syscall.Chdir("/"))
+	// changes the current working directory of the calling process to /tmp/ubuntu-fs
+	check(syscall.Chdir("/"), "sycall.chdir")
 
-	check(cmd.Run())
+	// https://man7.org/linux/man-pages/man2/mount.2.html
+	// mount container /proc to host /proc
+	// mount source: proc, target:proc, filesystem type:proc, mountflag: 0, data:""
+	check(syscall.Mount("proc", "proc", "proc", 0, ""), "syscal.mount")
+
+	check(cmd.Run(), "cmd.run")
 }
 
-func check(err error) {
-	panic(err)
+func check(err error, str string) {
+	if err != nil {
+		fmt.Println(str)
+		panic(err)
+	}
 }
