@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func Copy(input io.Reader, output io.Writer) error {
+func Copy(input io.ReadSeeker, output io.Writer) error {
 	// writer variable that write to output and stdout
 	writer := io.MultiWriter(output, os.Stdout)
 
