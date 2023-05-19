@@ -8,21 +8,21 @@ import (
 
 func PipeExample() error {
 	// create a pipe
-	reader, writer := io.Pipe()
+	pr, pw := io.Pipe()
 
 	go func() {
 		// this is a goroutine that writes to the 'writer'
 		data := []byte("Hello, Pipe!")
 
-		_, err := writer.Write(data)
+		_, err := pw.Write(data)
 		if err != nil {
 			fmt.Println("Error writing to pipe: ", err)
 		}
-		writer.Close()
+		pw.Close()
 	}()
 
 	//  read from the 'reader' to stdout
-	if _, err := io.Copy(os.Stdout, reader); err != nil {
+	if _, err := io.Copy(os.Stdout, pr); err != nil {
 		fmt.Println("Error reading from pipe: ", err)
 	}
 
